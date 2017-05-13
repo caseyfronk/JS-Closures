@@ -99,16 +99,14 @@ http://stackoverflow.com/questions/17776940/javascript-module-pattern-with-examp
 
 function counterFactory(value) {
     var count = value;
-    function inc() {
-        return ++count;
+    return {
+        inc: function() {
+            return ++count;
+        },
+        dec: function() {
+            return --count;
+        }
     }
-    function dec() {
-        return --count;
-    }
-
-  return {
-      
-  }
 }
 
 
@@ -139,11 +137,12 @@ function motivation(firstname, lastname) {
 
   var welcomeText = 'You\'re doing awesome, keep it up ';
 
-  // code message function here.
-
+    function message() {
+        return welcomeText + firstname + ' ' + lastname + '.';
+    }
 
   //Uncommment this to return the value of your invoked message function
-  //return message();
+  return message();
 
 }
 
@@ -177,15 +176,19 @@ var module = (function() {
   function privateMethod(){
     return "Hi, I'm " + person.name + ", age " + person.age + " from " + person.location;
   }
+    
 
   // Anything that is being returned is made public and can be invoked from
   // outside our lexical scope
   return {
-    // Code here.
+      publicMethod: function(){
+          return privateMethod();
+      }
   };
 
 })();
 
+module.publicMethod();
 
 
 /******************************************************************************\
@@ -201,7 +204,14 @@ var secondLevelFriends = ["Anne", "Harry", "Quinton"];
 var allUsers = ["Tom", "Dick", "Harry", "Anne", "Quinton", "Katie", "Mary"];
 
 function findPotentialFriends(existingFriends) {
-
+    return function(test) {
+        for(i = 0; i < existingFriends.length; i++) {
+            if(existingFriends[i] === test) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 var isNotAFriend = findPotentialFriends( friends );
@@ -216,8 +226,8 @@ var isNotAFriend = findPotentialFriends( friends );
 method, find all potential second level friends as well as potential friends
 from allUsers. */
 
-var potentialSecondLevelFriends = "?";
-var allPotentialFriends = "?";
+var potentialSecondLevelFriends = secondLevelFriends.filter(isNotAFriend);
+var allPotentialFriends = allUsers.filter(isNotAFriend);
 
 
 /******************************************************************************\
@@ -241,10 +251,11 @@ to 5. What we need to do is console.log(i) so that it logs like so:
  */
 
 function timeOutCounter() {
-  for (var i = 0; i <= 5; i++) {
+  for (var i = 0; i <= 5; i++) 
+      (function(j) {
     setTimeout(function() {
-    	console.log(i)
-	}, i * 1000)
-  }
+        console.log(j); 
+    }, i * 1000);
+  })(i);
 }
 timeOutCounter();
